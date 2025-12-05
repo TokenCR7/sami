@@ -4,13 +4,19 @@ import os
 import tempfile
 from datetime import timedelta
 
+# Page Setup
 st.set_page_config(page_title="TurboScribe Pro", page_icon="💎", layout="centered")
 
+# Custom CSS to hide "Manage App", Footer, Header, and Menu
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         header {visibility: hidden;}
+        .stDeployButton {display:none;}
+        [data-testid="stToolbar"] {visibility: hidden;}
+        [data-testid="stDecoration"] {visibility: hidden;}
+        [data-testid="stStatusWidget"] {visibility: hidden;}
         
         .stButton>button {
             width: 100%;
@@ -57,20 +63,26 @@ def segments_to_srt(segments):
 def load_model():
     return whisper.load_model("small")
 
-uploaded_file = st.file_uploader("📂 Upload Audio/Video File", type=["mp4", "mp3", "wav", "mkv", "mov", "m4a"])
+uploaded_file = st.file_uploader("📂 Upload Audio/Video File", type=["mp4", "mp3", "wav", "mkv", "mov", "m4a", "avi"])
 
 if uploaded_file:
+    # Play Feature
+    file_type = uploaded_file.name.split('.')[-1].lower()
+    if file_type in ['mp4', 'mkv', 'mov', 'avi']:
+        st.video(uploaded_file)
+    else:
+        st.audio(uploaded_file)
+
     if st.button("⚡ Start High Accuracy Extraction"):
         with st.spinner('Processing with High Precision... (Please wait)'):
             try:
-                file_ext = uploaded_file.name.split('.')[-1]
-                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_ext}") as tmp:
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_type}") as tmp:
                     tmp.write(uploaded_file.getvalue())
                     path = tmp.name
                 
                 model = load_model()
                 
-                # High Accuracy Settings: beam_size=5, temperature=0
+                # High Accuracy Settings
                 result = model.transcribe(
                     path, 
                     fp16=False, 
