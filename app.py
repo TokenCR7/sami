@@ -66,7 +66,7 @@ def load_model():
 uploaded_file = st.file_uploader("📂 Upload Audio/Video File", type=["mp4", "mp3", "wav", "mkv", "mov", "m4a", "avi"])
 
 if uploaded_file:
-    # Play Feature
+    # Play Feature (Video or Audio)
     file_type = uploaded_file.name.split('.')[-1].lower()
     if file_type in ['mp4', 'mkv', 'mov', 'avi']:
         st.video(uploaded_file)
@@ -82,7 +82,7 @@ if uploaded_file:
                 
                 model = load_model()
                 
-                # High Accuracy Settings
+                # High Accuracy Settings (Beam Search)
                 result = model.transcribe(
                     path, 
                     fp16=False, 
